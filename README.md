@@ -58,6 +58,12 @@ mysql -uroot -p < sql/01-schema.sql
 mysql -uroot -p < sql/02-init-data.sql
 ```
 
+如需让报表、分页、供应商质量排名和缺陷 Pareto 更丰富，可在主线数据之后额外导入扩展数据：
+
+```powershell
+mysql -uroot -p < sql/03-extra-report-data.sql
+```
+
 也可以在项目根目录执行重置脚本：
 
 ```powershell
@@ -135,6 +141,18 @@ docker compose up -d --build
 ```bash
 docker compose down -v
 docker compose up -d --build
+```
+
+数据库备份：
+
+```bash
+docker compose exec mysql sh -lc 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" quality_trace' > quality_trace_backup.sql
+```
+
+数据库恢复：
+
+```bash
+docker compose exec -T mysql sh -lc 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" quality_trace' < quality_trace_backup.sql
 ```
 
 ## 演示账号
@@ -224,6 +242,7 @@ npm run build
 - `docs/03-答辩清单.md`：演示前检查、推荐演示路线、数据库/后端/前端答辩口径、常见问题回答。
 - `docs/04-系统架构图.md`：整体架构、核心业务闭环、追溯数据链路和权限页面关系 Mermaid 图。
 - `docs/05-测试与验收报告.md`：测试环境、自动化验收脚本、功能测试用例、前端交互验收和最终结论。
+- `docs/06-数据库对象清单.md`：表、视图、触发器、存储过程、关键索引和数据脚本清单。
 - `backend/openapi.json`：后端 OpenAPI 快照，可作为接口附录。
 
 ## 交付说明
