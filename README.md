@@ -1,4 +1,14 @@
-# 基于 SpringBoot 的产品质量追踪系统
+<p align="center">
+  <img src="frontend/public/qt-logo.png" alt="星辉电器质量追踪系统" width="88">
+</p>
+
+<h1 align="center">基于 SpringBoot 的产品质量追踪系统</h1>
+
+<p align="center">
+  <a href="https://trace.jia4u.de">在线演示</a> ·
+  <a href="#公网部署推荐-docker-compose">Docker Compose 部署</a> ·
+  <a href="backend/openapi.json">OpenAPI</a>
+</p>
 
 数据库综合实践课程设计项目。系统围绕“供应商 -> 原材料批次 -> 生产工单 -> 半成品/成品批次 -> 客户”的质量追踪链路，实现主数据、批次、生产、三级检验、缺陷处置、出货、双向追溯、召回和统计报表。
 
@@ -6,7 +16,7 @@
 
 ## 演示站点
 
-公网演示地址：`https://trace.jia4u.de`
+公网演示地址：[https://trace.jia4u.de](https://trace.jia4u.de)
 
 演示账号见下方“演示账号”章节，所有演示账号密码均为 `123456`。
 
@@ -77,99 +87,48 @@ Vite 开发服务器固定使用 `5174`，并将 `/api` 代理到 `http://localh
 
 ## 公网部署（推荐 Docker Compose）
 
-推荐子域名：`trace.jia4u.de`。
-
-推荐部署结构：
+部署结构：
 
 ```text
-Caddy        80/443，对外提供 HTTPS、托管前端静态文件、反代 /api 到后端
-Spring Boot  8081，仅在 Docker 网络内暴露
-MySQL        3306，仅在 Docker 网络内暴露，首次启动自动执行 sql/ 初始化脚本
+Caddy        80/443，HTTPS、前端静态文件、/api 反代
+Spring Boot  8081，仅 Docker 网络内暴露
+MySQL        3306，仅 Docker 网络内暴露，首次启动执行 sql/ 初始化脚本
 ```
 
-### 1. DNS
+前置条件：域名解析到服务器，服务器开放 `80/tcp`、`443/tcp`，已安装 Docker、Docker Compose v2、Git。
 
-在域名服务商处添加 DNS 记录：
-
-```text
-trace.jia4u.de  A  <服务器公网 IPv4>
-```
-
-如果服务器有 IPv6，也可以额外添加 AAAA 记录。
-
-### 2. 服务器准备
-
-服务器需要安装：
-
-- Docker
-- Docker Compose v2
-- Git
-
-开放端口：
-
-```text
-80/tcp
-443/tcp
-```
-
-后端 `8081` 和 MySQL `3306` 不需要对公网开放。
-
-### 3. 拉取代码
+一键部署：
 
 ```bash
 git clone https://github.com/CPU-JIA/springboot-quality-trace.git
 cd springboot-quality-trace
+APP_DOMAIN=trace.jia4u.de ACME_EMAIL=admin@jia4u.de ./scripts/deploy-docker.sh
 ```
 
-### 4. 配置环境变量
+脚本会生成 `.env`，其中 MySQL/Druid 密码使用 `openssl rand -hex 32`，JWT 密钥使用 `openssl rand -hex 64`。如果需要重建密钥：
 
 ```bash
-cp .env.example .env
-nano .env
+FORCE=1 APP_DOMAIN=trace.jia4u.de ACME_EMAIL=admin@jia4u.de ./scripts/deploy-docker.sh
 ```
 
-至少修改：
-
-```env
-APP_DOMAIN=trace.jia4u.de
-ACME_EMAIL=你的邮箱
-MYSQL_ROOT_PASSWORD=强密码
-JWT_SECRET=至少32字节的随机密钥
-DRUID_LOGIN_PASSWORD=强密码
-```
-
-### 5. 启动
-
-```bash
-docker compose up -d --build
-```
-
-查看状态：
+常用命令：
 
 ```bash
 docker compose ps
 docker compose logs -f caddy
 docker compose logs -f backend
+docker compose up -d --build
+docker compose down -v
 ```
 
-访问：
-
-```text
-https://trace.jia4u.de
-```
-
-Caddy 会自动申请和续期 HTTPS 证书。
-
-### 6. 更新部署
+更新部署：
 
 ```bash
 git pull
 docker compose up -d --build
 ```
 
-### 7. 重置演示数据库
-
-Docker 的 MySQL 初始化脚本只会在数据卷首次创建时执行。如需完全恢复演示数据：
+重置演示数据库：
 
 ```bash
 docker compose down -v
