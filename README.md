@@ -102,13 +102,15 @@ MySQL        3306，仅 Docker 网络内暴露，首次启动执行 sql/ 初始�
 ```bash
 git clone https://github.com/CPU-JIA/springboot-quality-trace.git
 cd springboot-quality-trace
-APP_DOMAIN=trace.jia4u.de ACME_EMAIL=admin@jia4u.de ./scripts/deploy-docker.sh
+APP_DOMAIN=quality.example.com ACME_EMAIL=admin@example.com ./scripts/deploy-docker.sh
 ```
+
+其中 `APP_DOMAIN` 改成实际绑定的域名，`ACME_EMAIL` 改成证书通知邮箱。例如本站演示环境使用 `APP_DOMAIN=trace.jia4u.de`。
 
 脚本会生成 `.env`，其中 MySQL/Druid 密码使用 `openssl rand -hex 32`，JWT 密钥使用 `openssl rand -hex 64`。如果需要重建密钥：
 
 ```bash
-FORCE=1 APP_DOMAIN=trace.jia4u.de ACME_EMAIL=admin@jia4u.de ./scripts/deploy-docker.sh
+FORCE=1 APP_DOMAIN=quality.example.com ACME_EMAIL=admin@example.com ./scripts/deploy-docker.sh
 ```
 
 常用命令：

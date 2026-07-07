@@ -38,7 +38,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 .env 中设置 MYSQL_ROOT_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?请在 .env 中设置 JWT_SECRET}
       JWT_EXPIRE_MILLIS: ${JWT_EXPIRE_MILLIS:-86400000}
-      APP_CORS_ALLOWED_ORIGIN_PATTERNS: https://${APP_DOMAIN:-trace.jia4u.de}
+      APP_CORS_ALLOWED_ORIGIN_PATTERNS: https://${APP_DOMAIN:?请在 .env 中设置 APP_DOMAIN}
       DRUID_LOGIN_USERNAME: ${DRUID_LOGIN_USERNAME:-admin}
       DRUID_LOGIN_PASSWORD: ${DRUID_LOGIN_PASSWORD:?请在 .env 中设置 DRUID_LOGIN_PASSWORD}
       LOG_LEVEL_QUALITY_TRACE: ${LOG_LEVEL_QUALITY_TRACE:-info}
@@ -57,7 +57,7 @@ services:
     container_name: quality-trace-caddy
     restart: unless-stopped
     environment:
-      APP_DOMAIN: ${APP_DOMAIN:-trace.jia4u.de}
+      APP_DOMAIN: ${APP_DOMAIN:?请在 .env 中设置 APP_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL:?请在 .env 中设置 ACME_EMAIL}
     ports:
       - "80:80"
@@ -72,4 +72,3 @@ volumes:
   mysql-data:
   caddy-data:
   caddy-config:
-

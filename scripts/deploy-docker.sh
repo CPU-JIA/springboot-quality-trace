@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DOMAIN="${APP_DOMAIN:-trace.jia4u.de}"
-ACME_EMAIL="${ACME_EMAIL:-admin@jia4u.de}"
+APP_DOMAIN="${APP_DOMAIN:-}"
+ACME_EMAIL="${ACME_EMAIL:-}"
 ENV_FILE="${ENV_FILE:-.env}"
 FORCE="${FORCE:-0}"
 
@@ -19,6 +19,11 @@ rand_hex() {
 
 need_cmd openssl
 need_cmd docker
+
+if [[ -z "$APP_DOMAIN" || -z "$ACME_EMAIL" ]]; then
+  echo "用法：APP_DOMAIN=quality.example.com ACME_EMAIL=admin@example.com $0"
+  exit 1
+fi
 
 if ! docker compose version >/dev/null 2>&1; then
   echo "缺少 Docker Compose v2"
