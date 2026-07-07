@@ -1,0 +1,75 @@
+name: quality-trace
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: quality-trace-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 .env 中设置 MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/02-init-data.sql:/docker-entrypoint-initdb.d/02-init-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: quality-trace-backend
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/quality_trace?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 .env 中设置 MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?请在 .env 中设置 JWT_SECRET}
+      JWT_EXPIRE_MILLIS: ${JWT_EXPIRE_MILLIS:-86400000}
+      APP_CORS_ALLOWED_ORIGIN_PATTERNS: https://${APP_DOMAIN:-trace.jia4u.de}
+      DRUID_LOGIN_USERNAME: ${DRUID_LOGIN_USERNAME:-admin}
+      DRUID_LOGIN_PASSWORD: ${DRUID_LOGIN_PASSWORD:?请在 .env 中设置 DRUID_LOGIN_PASSWORD}
+      LOG_LEVEL_QUALITY_TRACE: ${LOG_LEVEL_QUALITY_TRACE:-info}
+      MYBATIS_LOG_IMPL: org.apache.ibatis.logging.nologging.NoLoggingImpl
+      JAVA_OPTS: ${JAVA_OPTS:--Xms256m -Xmx512m}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    expose:
+      - "8081"
+
+  caddy:
+    build:
+      context: .
+      dockerfile: deploy/caddy/Dockerfile
+    container_name: quality-trace-caddy
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-trace.jia4u.de}
+      ACME_EMAIL: ${ACME_EMAIL:?请在 .env 中设置 ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
+  caddy-data:
+  caddy-config:
+

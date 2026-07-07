@@ -6,7 +6,11 @@
 # =====================================================================
 
 server:
-  port: 8081
+  port: ${SERVER_PORT:8081}
+
+app:
+  cors:
+    allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:*}
 
 spring:
   application:
@@ -18,9 +22,9 @@ spring:
     # 本机 MySQL 8.4.10；serverTimezone 显式指定避免时区歧义。
     # 注意：characterEncoding 取值是 Java 字符集名 UTF-8（写 MySQL 字符集名 utf8mb4
     # 会抛 UnsupportedEncodingException），Connector/J 自动映射至服务端 utf8mb4
-    url: jdbc:mysql://localhost:3306/quality_trace?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: "123456"
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/quality_trace?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
     druid:
       # 连接池容量：课设本机开发场景的适度配置
       initial-size: 5
@@ -35,8 +39,8 @@ spring:
       stat-view-servlet:
         enabled: true
         url-pattern: /druid/*
-        login-username: admin
-        login-password: admin123
+        login-username: ${DRUID_LOGIN_USERNAME:admin}
+        login-password: ${DRUID_LOGIN_PASSWORD:admin123}
       # Web 请求监控：排除静态资源与接口文档路径，避免监控数据噪音
       web-stat-filter:
         enabled: true
@@ -65,15 +69,15 @@ mybatis-plus:
     # 数据库下划线列名 ←→ Java 驼峰属性自动映射（batch_no ↔ batchNo）
     map-underscore-to-camel-case: true
     # 开发期打印完整 SQL 到控制台，便于核对 MyBatis 生成的语句；生产应移除
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
 
 # ---------------- JWT 认证 ----------------
 jwt:
   # HS256 签名密钥：必须 ≥ 32 字节（256 位），否则 jjwt 抛 WeakKeyException
   # 课设环境写死于配置；生产环境应从环境变量/密钥管理服务注入
-  secret: "xinghui-quality-trace-jwt-secret-key-2026-course-design"
+  secret: ${JWT_SECRET:xinghui-quality-trace-jwt-secret-key-2026-course-design}
   # 令牌有效期：24 小时（单位：毫秒）
-  expire-millis: 86400000
+  expire-millis: ${JWT_EXPIRE_MILLIS:86400000}
 
 # ---------------- springdoc 接口文档 ----------------
 # 访问入口：http://localhost:8081/swagger-ui/index.html
@@ -91,4 +95,4 @@ logging:
   level:
     root: info
     # 本项目包提升至 debug：开发期观察业务流转
-    com.xinghui.qualitytrace: debug
+    com.xinghui.qualitytrace: ${LOG_LEVEL_QUALITY_TRACE:debug}

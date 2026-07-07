@@ -4,11 +4,18 @@
 
 本工程是前后端联调完成版本，不是静态模板。后端提供真实数据库事务与接口，前端页面通过接口读写 MySQL 演示数据，验证脚本覆盖只读接口、角色权限、关键交互、端到端业务流程和单号并发。
 
+## 演示站点
+
+公网演示地址：`https://trace.jia4u.de`
+
+演示账号见下方“演示账号”章节，所有演示账号密码均为 `123456`。
+
 ## 项目结构
 
 ```text
 backend/   Spring Boot + MyBatis-Plus 后端
 frontend/  Vue 3 + Vite + Element Plus 前端
+deploy/    Caddy 网关与前端静态站点镜像配置
 docs/      需求分析、数据库设计、答辩截图
 sql/       MySQL 建表脚本与演示数据
 scripts/   数据库重置、接口/前端/E2E 验证脚本
@@ -67,6 +74,107 @@ npm run dev
 ```
 
 Vite 开发服务器固定使用 `5174`，并将 `/api` 代理到 `http://localhost:8081`。
+
+## 公网部署（推荐 Docker Compose）
+
+推荐子域名：`trace.jia4u.de`。
+
+推荐部署结构：
+
+```text
+Caddy        80/443，对外提供 HTTPS、托管前端静态文件、反代 /api 到后端
+Spring Boot  8081，仅在 Docker 网络内暴露
+MySQL        3306，仅在 Docker 网络内暴露，首次启动自动执行 sql/ 初始化脚本
+```
+
+### 1. DNS
+
+在域名服务商处添加 DNS 记录：
+
+```text
+trace.jia4u.de  A  <服务器公网 IPv4>
+```
+
+如果服务器有 IPv6，也可以额外添加 AAAA 记录。
+
+### 2. 服务器准备
+
+服务器需要安装：
+
+- Docker
+- Docker Compose v2
+- Git
+
+开放端口：
+
+```text
+80/tcp
+443/tcp
+```
+
+后端 `8081` 和 MySQL `3306` 不需要对公网开放。
+
+### 3. 拉取代码
+
+```bash
+git clone https://github.com/CPU-JIA/springboot-quality-trace.git
+cd springboot-quality-trace
+```
+
+### 4. 配置环境变量
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+至少修改：
+
+```env
+APP_DOMAIN=trace.jia4u.de
+ACME_EMAIL=你的邮箱
+MYSQL_ROOT_PASSWORD=强密码
+JWT_SECRET=至少32字节的随机密钥
+DRUID_LOGIN_PASSWORD=强密码
+```
+
+### 5. 启动
+
+```bash
+docker compose up -d --build
+```
+
+查看状态：
+
+```bash
+docker compose ps
+docker compose logs -f caddy
+docker compose logs -f backend
+```
+
+访问：
+
+```text
+https://trace.jia4u.de
+```
+
+Caddy 会自动申请和续期 HTTPS 证书。
+
+### 6. 更新部署
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+### 7. 重置演示数据库
+
+Docker 的 MySQL 初始化脚本只会在数据卷首次创建时执行。如需完全恢复演示数据：
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
 
 ## 演示账号
 

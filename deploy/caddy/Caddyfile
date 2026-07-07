@@ -1,0 +1,25 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	root * /srv/app
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+
+	route {
+		reverse_proxy /api/* backend:8081
+		reverse_proxy /v3/* backend:8081
+		reverse_proxy /swagger-ui* backend:8081
+
+		try_files {path} /index.html
+		file_server
+	}
+}
+
