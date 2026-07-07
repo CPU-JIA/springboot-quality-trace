@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://trace.jia4u.de">在线演示</a> ·
   <a href="#公网部署推荐-docker-compose">Docker Compose 部署</a> ·
-  <a href="backend/openapi.json">OpenAPI</a>
+  <a href="https://trace.jia4u.de/v3/api-docs">OpenAPI</a>
 </p>
 
 数据库综合实践课程设计项目。系统围绕“供应商 -> 原材料批次 -> 生产工单 -> 半成品/成品批次 -> 客户”的质量追踪链路，实现主数据、批次、生产、三级检验、缺陷处置、出货、双向追溯、召回和统计报表。
@@ -16,7 +16,11 @@
 
 ## 演示站点
 
-公网演示地址：[https://trace.jia4u.de](https://trace.jia4u.de)
+| 入口 | 地址 |
+| --- | --- |
+| 公网演示 | [https://trace.jia4u.de](https://trace.jia4u.de) |
+| Swagger 接口文档 | [https://trace.jia4u.de/swagger-ui/index.html](https://trace.jia4u.de/swagger-ui/index.html) |
+| OpenAPI JSON | [https://trace.jia4u.de/v3/api-docs](https://trace.jia4u.de/v3/api-docs) |
 
 演示账号见下方“演示账号”章节，所有演示账号密码均为 `123456`。
 
