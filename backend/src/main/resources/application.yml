@@ -1,0 +1,94 @@
+# =====================================================================
+# 产品质量追踪系统 · 后端配置（开发环境）
+# =====================================================================
+# 环境要求：JDK 21+ / MySQL 8.4.10（服务名 MySQL84，库 quality_trace 已由
+#           sql/01-schema.sql + 02-init-data.sql 初始化）
+# =====================================================================
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: quality-trace
+
+  # ---------------- 数据源：Druid 连接池 ----------------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 本机 MySQL 8.4.10；serverTimezone 显式指定避免时区歧义。
+    # 注意：characterEncoding 取值是 Java 字符集名 UTF-8（写 MySQL 字符集名 utf8mb4
+    # 会抛 UnsupportedEncodingException），Connector/J 自动映射至服务端 utf8mb4
+    url: jdbc:mysql://localhost:3306/quality_trace?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: "123456"
+    druid:
+      # 连接池容量：课设本机开发场景的适度配置
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 6000
+      # ★配置纪律：只开 stat（SQL 统计监控），绝不开 wall（防火墙）——
+      #   wall 的 SQL 解析器对 WITH RECURSIVE 存在历史解析缺陷，解析失败会直接
+      #   拒绝执行 SQL，而本系统的追溯功能完全依赖递归 CTE（灵魂功能不能赌）
+      filters: stat
+      # Druid 内置监控台：http://localhost:8081/druid（答辩演示 SQL 执行统计/慢SQL）
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin123
+      # Web 请求监控：排除静态资源与接口文档路径，避免监控数据噪音
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.css,*.ico,/druid/*,/v3/api-docs/*,/swagger-ui/*"
+
+  # ---------------- Jackson 序列化 ----------------
+  # LocalDateTime 统一格式（前后端契约：yyyy-MM-dd HH:mm:ss）；
+  # Long→String 的防精度丢失序列化在 JacksonConfig 中以代码方式配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+# ---------------- MyBatis-Plus ----------------
+mybatis-plus:
+  # 复杂 SQL（递归 CTE 追溯、统计报表）的手写 XML 位置
+  mapper-locations: classpath:mapper/**/*.xml
+  global-config:
+    banner: false
+    db-config:
+      # ★主键策略必须显式设为 AUTO（跟随表的 AUTO_INCREMENT）——
+      #   MP 默认 ASSIGN_ID 雪花算法会绕过数据库自增，插入 19 位 Long 主键，
+      #   该数值超出 JS Number 安全整数(2^53)导致前端静默精度丢失
+      id-type: auto
+  configuration:
+    # 数据库下划线列名 ←→ Java 驼峰属性自动映射（batch_no ↔ batchNo）
+    map-underscore-to-camel-case: true
+    # 开发期打印完整 SQL 到控制台，便于核对 MyBatis 生成的语句；生产应移除
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# ---------------- JWT 认证 ----------------
+jwt:
+  # HS256 签名密钥：必须 ≥ 32 字节（256 位），否则 jjwt 抛 WeakKeyException
+  # 课设环境写死于配置；生产环境应从环境变量/密钥管理服务注入
+  secret: "xinghui-quality-trace-jwt-secret-key-2026-course-design"
+  # 令牌有效期：24 小时（单位：毫秒）
+  expire-millis: 86400000
+
+# ---------------- springdoc 接口文档 ----------------
+# 访问入口：http://localhost:8081/swagger-ui/index.html
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # 按 Controller 的 @Tag 排序展示
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+# ---------------- 日志 ----------------
+logging:
+  level:
+    root: info
+    # 本项目包提升至 debug：开发期观察业务流转
+    com.xinghui.qualitytrace: debug

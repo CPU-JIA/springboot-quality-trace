@@ -1,0 +1,274 @@
+:root {
+  --app-bg: #f4f6f5;
+  --app-panel: #ffffff;
+  --app-panel-soft: #f9faf8;
+  --app-border: #d9dfdc;
+  --app-border-strong: #b7c1bd;
+  --app-text: #1e2b26;
+  --app-muted: #66736e;
+  --app-primary: #1f6f5b;
+  --app-primary-soft: #e1f0eb;
+  --app-accent: #b86b2b;
+  --app-danger: #b84242;
+  --app-warning: #a56a18;
+  --app-blue: #2f6f9f;
+  --app-radius: 6px;
+  font-family:
+    "Microsoft YaHei",
+    "PingFang SC",
+    "Source Han Sans SC",
+    "Noto Sans CJK SC",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  color: var(--app-text);
+  background: var(--app-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0 2px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.page-subtitle {
+  margin: 6px 0 0;
+  color: var(--app-muted);
+  font-size: 13px;
+}
+
+.work-panel {
+  width: 100%;
+  padding: 16px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 48px;
+  padding-top: 12px;
+  margin-top: 10px;
+  border-top: 1px solid var(--app-border);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.muted {
+  color: var(--app-muted);
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  min-height: 116px;
+  padding: 18px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+}
+
+.metric-label {
+  color: var(--app-muted);
+  font-size: 13px;
+}
+
+.metric-value {
+  margin-top: 16px;
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1;
+  color: var(--app-text);
+}
+
+.metric-foot {
+  margin-top: 10px;
+  color: var(--app-muted);
+  font-size: 12px;
+}
+
+.chart {
+  width: 100%;
+  height: 360px;
+}
+
+.chart.tall {
+  height: 520px;
+}
+
+.split-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+  gap: 16px;
+}
+
+.status-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px 10px;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.table-actions .el-button {
+  flex: 0 0 auto;
+  margin-left: 0 !important;
+  padding-right: 2px;
+  padding-left: 2px;
+}
+
+.table-actions .el-button > span {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.table-actions--end {
+  justify-content: flex-end;
+}
+
+.table-actions--wrap {
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+.drawer-section {
+  margin-bottom: 18px;
+}
+
+.drawer-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.empty-hint {
+  padding: 34px 16px;
+  color: var(--app-muted);
+  text-align: center;
+  border: 1px dashed var(--app-border-strong);
+  border-radius: var(--app-radius);
+  background: var(--app-panel-soft);
+}
+
+.el-button {
+  border-radius: 5px;
+}
+
+.el-card {
+  border-radius: var(--app-radius);
+}
+
+.el-table {
+  --el-table-border-color: var(--app-border);
+  --el-table-header-bg-color: #eef2f0;
+  --el-table-header-text-color: #293b34;
+}
+
+.el-menu {
+  border-right: 0;
+}
+
+.el-dialog {
+  border-radius: var(--app-radius);
+}
+
+@media (max-width: 1180px) {
+  .metric-grid,
+  .split-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .metric-grid,
+  .split-grid,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .span-2 {
+    grid-column: auto;
+  }
+
+  .work-panel {
+    padding: 12px;
+  }
+}
