@@ -14,6 +14,7 @@ services:
       - --collation-server=utf8mb4_0900_ai_ci
       - --default-time-zone=+08:00
     volumes:
+      - ./deploy/mysql/conf.d/charset.cnf:/etc/mysql/conf.d/charset.cnf:ro
       - mysql-data:/var/lib/mysql
       - ./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./sql/02-init-data.sql:/docker-entrypoint-initdb.d/02-init-data.sql:ro

@@ -54,14 +54,14 @@ plan/      实现计划与验收记录
 项目默认连接本机 MySQL：`root / 123456`，数据库名 `quality_trace`。
 
 ```powershell
-mysql -uroot -p < sql/01-schema.sql
-mysql -uroot -p < sql/02-init-data.sql
+mysql --default-character-set=utf8mb4 -uroot -p < sql/01-schema.sql
+mysql --default-character-set=utf8mb4 -uroot -p < sql/02-init-data.sql
 ```
 
 如需让报表、分页、供应商质量排名和缺陷 Pareto 更丰富，可在主线数据之后额外导入扩展数据：
 
 ```powershell
-mysql -uroot -p < sql/03-extra-report-data.sql
+mysql --default-character-set=utf8mb4 -uroot -p < sql/03-extra-report-data.sql
 ```
 
 也可以在项目根目录执行重置脚本：
@@ -142,6 +142,8 @@ docker compose up -d --build
 docker compose down -v
 docker compose up -d --build
 ```
+
+如果页面已经出现中文乱码，说明旧数据卷曾以错误客户端字符集导入过 SQL。拉取最新代码后执行上面的重置命令即可重建数据卷。
 
 数据库备份：
 
